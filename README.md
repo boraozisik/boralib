@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bora's Library
 
-## Getting Started
+My personal digital library: the books on my shelves, with their covers, in English or Turkish. Anyone can look around; only the admin can add, edit or delete books, and only the admin can see and write the private notes kept for each book.
 
-First, run the development server:
+Built with Next.js (App Router, Cache Components), Turso (SQLite) and Tailwind CSS, and deployed on Netlify.
+
+## Running locally
 
 ```bash
+npm install
+cp .env.example .env.local   # then fill in the admin username/password/secret
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. To sign in, use the small **admin** link at the bottom right of any page.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Which database is used?
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| `.env.local` | Data used |
+| --- | --- |
+| `TURSO_DATABASE_URL` empty | A local file, `data/library.db`, for experiments. Delete the `data/` folder to start over. |
+| `TURSO_DATABASE_URL` set | The hosted Turso database, the same data as the live site. |
 
-## Learn More
+## Features
 
-To learn more about Next.js, take a look at the following resources:
+- **Public view:** book grid, search (case- and accent-insensitive, so `oguz` finds `Oğuz Atay`), author/genre menus, status tabs and sorting. Notes are private: visitors never see them (not even whether a book has notes).
+- **Admin:** add/edit/delete books, change status with one click, and a large notes editor that saves as you type (Markdown, a 📅 date heading button, focus mode).
+- **Covers:** drag and drop, pick a file, paste from the clipboard, or paste an image link. All are resized before upload.
+- **English / Turkish:** a switch in the top right changes the whole interface. The choice is remembered in a cookie; first-time visitors get Turkish if their browser prefers it. Genres are stored in English and shown in the chosen language.
+- **Sorting:** "Recently added" (default), title or author, using Turkish alphabetical order.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/
+    page.tsx                 Book list + filters
+    admin/page.tsx           Admin sign in
+    books/new/page.tsx       Add a book (admin)
+    books/[id]/page.tsx      Book page + notes
+    books/[id]/edit/page.tsx Edit a book (admin)
+    actions.ts               Server actions (all writes check for admin)
+    api/covers/[id]/         Serves cover images from the database
+    api/image-proxy/         Lets the admin load cover images from links
+  components/                UI pieces (form, filters, notes editor, language switch…)
+  lib/
+    db.ts                    Database connection (Turso or local file) and tables
+    books.ts                 Book queries
+    covers.ts                Cover storage
+    auth.ts                  Admin session cookie
+    i18n.ts                  English and Turkish texts
+    locale.ts                Picks the visitor's language
+    resize-image.ts          Browser-side cover resizing
+```
