@@ -202,6 +202,7 @@ const tr: Dict = {
     "Classics & Novels": "Klasik & Roman",
     "Crime & Thriller": "Polisiye & Gerilim",
     "Fantasy & Sci-Fi": "Fantastik & Bilimkurgu",
+    "Horror & Suspense": "Korku & Gerilim",
     Philosophy: "Felsefe",
     Essays: "Deneme",
     Memoir: "Anı",
